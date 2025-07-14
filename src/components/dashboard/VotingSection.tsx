@@ -6,7 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import VoteModal from '@/components/voting/VoteModal';
-import { Vote, Clock, Users, CheckCircle } from 'lucide-react';
+import CreateRecipeModal from '@/components/recipes/CreateRecipeModal';
+import { Vote, Clock, Users, CheckCircle, Plus } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
 
 interface VotingProposal {
@@ -24,6 +25,7 @@ const VotingSection: React.FC = () => {
   const [proposals, setProposals] = useState<VotingProposal[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProposal, setSelectedProposal] = useState<VotingProposal | null>(null);
+  const [showCreateRecipe, setShowCreateRecipe] = useState(false);
   const { user } = useAuth();
 
   const fetchProposals = async () => {
@@ -96,10 +98,16 @@ const VotingSection: React.FC = () => {
             Participe das decisões da cervejaria
           </p>
         </div>
-        <Button>
-          <Vote className="mr-2 h-4 w-4" />
-          Histórico
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowCreateRecipe(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Receita
+          </Button>
+          <Button variant="outline">
+            <Vote className="mr-2 h-4 w-4" />
+            Histórico
+          </Button>
+        </div>
       </div>
 
       {proposals.length === 0 ? (
@@ -181,6 +189,12 @@ const VotingSection: React.FC = () => {
           onVoteSuccess={() => fetchProposals()}
         />
       )}
+      
+      <CreateRecipeModal
+        isOpen={showCreateRecipe}
+        onClose={() => setShowCreateRecipe(false)}
+        onSuccess={() => fetchProposals()}
+      />
     </div>
   );
 };
