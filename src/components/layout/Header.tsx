@@ -9,9 +9,11 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Beer, User, LogOut } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const { user, signOut } = useAuth();
+  const location = useLocation();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -26,16 +28,31 @@ const Header: React.FC = () => {
         <nav className="flex items-center space-x-4">
           {user ? (
             <>
-              <Button variant="ghost" size="sm">
-                Dashboard
+              <Button variant="ghost" size="sm" asChild>
+                <Link 
+                  to="/dashboard" 
+                  className={location.pathname === '/dashboard' ? 'text-primary' : ''}
+                >
+                  Dashboard
+                </Link>
               </Button>
-              <Button variant="ghost" size="sm">
-                Minhas Cotas
+              <Button variant="ghost" size="sm" asChild>
+                <Link 
+                  to="/minhas-cotas" 
+                  className={location.pathname === '/minhas-cotas' ? 'text-primary' : ''}
+                >
+                  Minhas Cotas
+                </Link>
               </Button>
-              <Button variant="ghost" size="sm">
-                Votações
+              <Button variant="ghost" size="sm" asChild>
+                <Link 
+                  to="/votacoes" 
+                  className={location.pathname === '/votacoes' ? 'text-primary' : ''}
+                >
+                  Votações
+                </Link>
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" disabled>
                 Produção
               </Button>
               

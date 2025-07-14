@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import Header from '@/components/layout/Header';
-import Dashboard from '@/components/dashboard/Dashboard';
+import { useNavigate } from 'react-router-dom';
 import AuthModal from '@/components/auth/AuthModal';
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   if (loading) {
     return (
@@ -22,12 +28,7 @@ const Index = () => {
     return <AuthModal />;
   }
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <Dashboard />
-    </div>
-  );
+  return null;
 };
 
 export default Index;
