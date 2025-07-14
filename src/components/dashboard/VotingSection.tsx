@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import VoteModal from '@/components/voting/VoteModal';
 import { Vote, Clock, Users, CheckCircle } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
 
@@ -22,26 +23,27 @@ interface VotingProposal {
 const VotingSection: React.FC = () => {
   const [proposals, setProposals] = useState<VotingProposal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProposal, setSelectedProposal] = useState<VotingProposal | null>(null);
   const { user } = useAuth();
 
+  const fetchProposals = async () => {
+    try {
+      const { data } = await supabase
+        .from('voting_proposals')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      setProposals(data || []);
+    } catch (error) {
+      console.error('Error fetching proposals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchProposals = async () => {
-      try {
-        const { data } = await supabase
-          .from('voting_proposals')
-          .select('*')
-          .eq('status', 'active')
-          .order('created_at', { ascending: false })
-          .limit(5);
-
-        setProposals(data || []);
-      } catch (error) {
-        console.error('Error fetching proposals:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchProposals();
   }, []);
 
@@ -153,7 +155,10 @@ const VotingSection: React.FC = () => {
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button className="flex-1">
+                    <Button 
+                      className="flex-1"
+                      onClick={() => setSelectedProposal(proposal)}
+                    >
                       <Vote className="mr-2 h-4 w-4" />
                       Votar
                     </Button>
@@ -166,6 +171,15 @@ const VotingSection: React.FC = () => {
             </Card>
           ))}
         </div>
+      )}
+      
+      {selectedProposal && (
+        <VoteModal
+          proposal={selectedProposal}
+          isOpen={!!selectedProposal}
+          onClose={() => setSelectedProposal(null)}
+          onVoteSuccess={() => fetchProposals()}
+        />
       )}
     </div>
   );

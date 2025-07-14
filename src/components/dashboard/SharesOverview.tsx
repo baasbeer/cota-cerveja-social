@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import PurchaseSharesModal from '@/components/shares/PurchaseSharesModal';
 import { Coins, TrendingUp, Users, ShoppingCart } from 'lucide-react';
 
 interface SharesData {
@@ -22,46 +23,47 @@ const SharesOverview: React.FC = () => {
     userVotingPower: 0
   });
   const [loading, setLoading] = useState(true);
+  const [showPurchaseModal, setShowPurchaseModal] = useState(false);
   const { user } = useAuth();
 
-  useEffect(() => {
-    const fetchSharesData = async () => {
-      if (!user) return;
-      
-      try {
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .single();
+  const fetchSharesData = async () => {
+    if (!user) return;
+    
+    try {
+      // Get user profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
 
-        if (profile) {
-          // Get user shares
-          const { data: userShares } = await supabase
-            .from('beer_shares')
-            .select('*')
-            .eq('owner_id', profile.id);
+      if (profile) {
+        // Get user shares
+        const { data: userShares } = await supabase
+          .from('beer_shares')
+          .select('*')
+          .eq('owner_id', profile.id);
 
-          // Get total shares sold
-          const { data: totalShares } = await supabase
-            .from('beer_shares')
-            .select('share_number');
+        // Get total shares sold
+        const { data: totalShares } = await supabase
+          .from('beer_shares')
+          .select('share_number');
 
-          setSharesData({
-            userShares: userShares?.length || 0,
-            totalShares: totalShares?.length || 0,
-            shareValue: 100, // Base value, could be dynamic
-            userVotingPower: ((userShares?.length || 0) / 10000) * 100
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching shares data:', error);
-      } finally {
-        setLoading(false);
+        setSharesData({
+          userShares: userShares?.length || 0,
+          totalShares: totalShares?.length || 0,
+          shareValue: 100, // Base value, could be dynamic
+          userVotingPower: ((userShares?.length || 0) / 10000) * 100
+        });
       }
-    };
+    } catch (error) {
+      console.error('Error fetching shares data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSharesData();
   }, [user]);
 
@@ -164,7 +166,10 @@ const SharesOverview: React.FC = () => {
           </div>
           
           <div className="flex gap-2">
-            <Button className="flex-1">
+            <Button 
+              className="flex-1"
+              onClick={() => setShowPurchaseModal(true)}
+            >
               Comprar Cotas
             </Button>
             <Button variant="outline" className="flex-1">
@@ -173,6 +178,12 @@ const SharesOverview: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      
+      <PurchaseSharesModal
+        isOpen={showPurchaseModal}
+        onClose={() => setShowPurchaseModal(false)}
+        onPurchaseSuccess={fetchSharesData}
+      />
     </div>
   );
 };
