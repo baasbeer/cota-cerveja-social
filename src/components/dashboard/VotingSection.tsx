@@ -3,12 +3,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import VoteModal from '@/components/voting/VoteModal';
 import CreateRecipeModal from '@/components/recipes/CreateRecipeModal';
-import { Vote, Clock, Users, CheckCircle, Plus } from 'lucide-react';
+import { Vote, Clock, Users, CheckCircle, Plus, MoreVertical } from 'lucide-react';
 import { Json } from '@/integrations/supabase/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VotingProposal {
   id: string;
@@ -27,6 +34,7 @@ const VotingSection: React.FC = () => {
   const [selectedProposal, setSelectedProposal] = useState<VotingProposal | null>(null);
   const [showCreateRecipe, setShowCreateRecipe] = useState(false);
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const fetchProposals = async () => {
     try {
@@ -98,7 +106,8 @@ const VotingSection: React.FC = () => {
             Participe das decisões da cervejaria
           </p>
         </div>
-        <div className="flex gap-2">
+        {/* Desktop Buttons */}
+        <div className={`flex gap-2 ${isMobile ? 'hidden' : ''}`}>
           <Button variant="outline" onClick={() => setShowCreateRecipe(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Nova Receita
@@ -108,6 +117,27 @@ const VotingSection: React.FC = () => {
             Histórico
           </Button>
         </div>
+
+        {/* Mobile Hamburger Menu */}
+        {isMobile && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setShowCreateRecipe(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Nova Receita
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Vote className="mr-2 h-4 w-4" />
+                Histórico
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {proposals.length === 0 ? (
