@@ -18,52 +18,115 @@ export type Database = {
         Row: {
           abv: number | null
           approved_at: string | null
+          batch_size: number | null
           created_at: string | null
           created_by: string
           description: string | null
+          estimated_cost: number | null
           ibu: number | null
           id: string
           ingredients: Json
+          instructions: string | null
           name: string
           process_steps: Json
           production_date: string | null
           srm: number | null
-          status: string
+          status: Database["public"]["Enums"]["recipe_status"] | null
+          style: string | null
         }
         Insert: {
           abv?: number | null
           approved_at?: string | null
+          batch_size?: number | null
           created_at?: string | null
           created_by: string
           description?: string | null
+          estimated_cost?: number | null
           ibu?: number | null
           id?: string
           ingredients?: Json
+          instructions?: string | null
           name: string
           process_steps?: Json
           production_date?: string | null
           srm?: number | null
-          status?: string
+          status?: Database["public"]["Enums"]["recipe_status"] | null
+          style?: string | null
         }
         Update: {
           abv?: number | null
           approved_at?: string | null
+          batch_size?: number | null
           created_at?: string | null
           created_by?: string
           description?: string | null
+          estimated_cost?: number | null
           ibu?: number | null
           id?: string
           ingredients?: Json
+          instructions?: string | null
           name?: string
           process_steps?: Json
           production_date?: string | null
           srm?: number | null
-          status?: string
+          status?: Database["public"]["Enums"]["recipe_status"] | null
+          style?: string | null
         }
         Relationships: [
           {
             foreignKeyName: "beer_recipes_created_by_fkey"
             columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beer_reviews: {
+        Row: {
+          appearance_rating: number | null
+          aroma_rating: number | null
+          created_at: string | null
+          flavor_notes: string | null
+          id: string
+          overall_comment: string | null
+          production_id: string | null
+          rating: number | null
+          reviewer_id: string | null
+        }
+        Insert: {
+          appearance_rating?: number | null
+          aroma_rating?: number | null
+          created_at?: string | null
+          flavor_notes?: string | null
+          id?: string
+          overall_comment?: string | null
+          production_id?: string | null
+          rating?: number | null
+          reviewer_id?: string | null
+        }
+        Update: {
+          appearance_rating?: number | null
+          aroma_rating?: number | null
+          created_at?: string | null
+          flavor_notes?: string | null
+          id?: string
+          overall_comment?: string | null
+          production_id?: string | null
+          rating?: number | null
+          reviewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beer_reviews_production_id_fkey"
+            columns: ["production_id"]
+            isOneToOne: false
+            referencedRelation: "productions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beer_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -105,6 +168,92 @@ export type Database = {
           {
             foreignKeyName: "beer_shares_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investments: {
+        Row: {
+          amount_paid: number | null
+          created_at: string | null
+          delivery_status: string | null
+          id: string
+          investor_id: string | null
+          production_id: string | null
+          quotas_purchased: number | null
+          quotas_received: number | null
+        }
+        Insert: {
+          amount_paid?: number | null
+          created_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          investor_id?: string | null
+          production_id?: string | null
+          quotas_purchased?: number | null
+          quotas_received?: number | null
+        }
+        Update: {
+          amount_paid?: number | null
+          created_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          investor_id?: string | null
+          production_id?: string | null
+          quotas_purchased?: number | null
+          quotas_received?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investments_investor_id_fkey"
+            columns: ["investor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investments_production_id_fkey"
+            columns: ["production_id"]
+            isOneToOne: false
+            referencedRelation: "productions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message: string
+          read?: boolean | null
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -155,34 +304,178 @@ export type Database = {
           },
         ]
       }
+      production_votes: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          id: string
+          production_id: string | null
+          vote_type: string | null
+          voter_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          production_id?: string | null
+          vote_type?: string | null
+          voter_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          id?: string
+          production_id?: string | null
+          vote_type?: string | null
+          voter_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "production_votes_production_id_fkey"
+            columns: ["production_id"]
+            isOneToOne: false
+            referencedRelation: "productions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "production_votes_voter_id_fkey"
+            columns: ["voter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      productions: {
+        Row: {
+          actual_completion: string | null
+          brewer_id: string | null
+          created_at: string | null
+          description: string | null
+          estimated_completion: string | null
+          final_volume: number | null
+          funding_deadline: string | null
+          id: string
+          max_quotas: number | null
+          min_quotas: number | null
+          name: string
+          quota_price: number | null
+          recipe_id: string | null
+          status: string | null
+          target_amount: number | null
+          updated_at: string | null
+          voting_deadline: string | null
+        }
+        Insert: {
+          actual_completion?: string | null
+          brewer_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          final_volume?: number | null
+          funding_deadline?: string | null
+          id?: string
+          max_quotas?: number | null
+          min_quotas?: number | null
+          name: string
+          quota_price?: number | null
+          recipe_id?: string | null
+          status?: string | null
+          target_amount?: number | null
+          updated_at?: string | null
+          voting_deadline?: string | null
+        }
+        Update: {
+          actual_completion?: string | null
+          brewer_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          estimated_completion?: string | null
+          final_volume?: number | null
+          funding_deadline?: string | null
+          id?: string
+          max_quotas?: number | null
+          min_quotas?: number | null
+          name?: string
+          quota_price?: number | null
+          recipe_id?: string | null
+          status?: string | null
+          target_amount?: number | null
+          updated_at?: string | null
+          voting_deadline?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productions_brewer_id_fkey"
+            columns: ["brewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "productions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "beer_recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          active: boolean | null
+          address: string | null
           avatar_url: string | null
           bio: string | null
+          brewery_name: string | null
+          certifications: string | null
           created_at: string | null
           email: string
+          experience_years: number | null
           full_name: string | null
           id: string
+          investment_limit: number | null
+          phone: string | null
+          preferred_styles: string[] | null
+          role: Database["public"]["Enums"]["user_role"] | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          active?: boolean | null
+          address?: string | null
           avatar_url?: string | null
           bio?: string | null
+          brewery_name?: string | null
+          certifications?: string | null
           created_at?: string | null
           email: string
+          experience_years?: number | null
           full_name?: string | null
           id?: string
+          investment_limit?: number | null
+          phone?: string | null
+          preferred_styles?: string[] | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          active?: boolean | null
+          address?: string | null
           avatar_url?: string | null
           bio?: string | null
+          brewery_name?: string | null
+          certifications?: string | null
           created_at?: string | null
           email?: string
+          experience_years?: number | null
           full_name?: string | null
           id?: string
+          investment_limit?: number | null
+          phone?: string | null
+          preferred_styles?: string[] | null
+          role?: Database["public"]["Enums"]["user_role"] | null
           updated_at?: string | null
           user_id?: string
         }
@@ -323,13 +616,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_role: {
+        Args: { user_profile_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
       get_user_voting_power: {
         Args: { user_profile_id: string }
         Returns: number
       }
     }
     Enums: {
-      [_ in never]: never
+      recipe_status: "DRAFT" | "VOTING" | "APPROVED" | "REJECTED"
+      user_role: "ADMIN" | "BREWER" | "INVESTOR"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -456,6 +754,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      recipe_status: ["DRAFT", "VOTING", "APPROVED", "REJECTED"],
+      user_role: ["ADMIN", "BREWER", "INVESTOR"],
+    },
   },
 } as const

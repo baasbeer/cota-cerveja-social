@@ -120,7 +120,7 @@ const CreateRecipeModal: React.FC<CreateRecipeModalProps> = ({ isOpen, onClose, 
         ingredients: filteredIngredients as any,
         process_steps: filteredSteps as any,
         created_by: profile.id,
-        status: 'development'
+        status: 'DRAFT'
       };
 
       const { data: recipe, error: recipeError } = await supabase

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserRole } from '@/hooks/useUserRole';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import {
   Drawer,
@@ -16,15 +19,35 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { Beer, User, LogOut, Menu, X } from 'lucide-react';
+import { Beer, User, LogOut, Menu, X, Settings, Users, Briefcase } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { RoleGate } from '@/components/auth/RoleGate';
 
 const Header: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { profile, role } = useUserRole();
   const location = useLocation();
   const isMobile = useIsMobile();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const getRoleDisplayName = (role: string) => {
+    switch (role) {
+      case 'ADMIN': return 'Administrador';
+      case 'BREWER': return 'Cervejeiro';
+      case 'INVESTOR': return 'Investidor';
+      default: return 'Usuário';
+    }
+  };
+
+  const getRoleVariant = (role: string) => {
+    switch (role) {
+      case 'ADMIN': return 'destructive';
+      case 'BREWER': return 'secondary';
+      case 'INVESTOR': return 'default';
+      default: return 'outline';
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -79,10 +102,36 @@ const Header: React.FC = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56" align="end">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-medium">{profile?.full_name || user.email}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant={getRoleVariant(role)} className="text-xs">
+                        {getRoleDisplayName(role)}
+                      </Badge>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem>
                     <User className="mr-2 h-4 w-4" />
                     Perfil
                   </DropdownMenuItem>
+                  <RoleGate role="ADMIN">
+                    <DropdownMenuItem>
+                      <Settings className="mr-2 h-4 w-4" />
+                      Configurações
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Users className="mr-2 h-4 w-4" />
+                      Gerenciar Usuários
+                    </DropdownMenuItem>
+                  </RoleGate>
+                  <RoleGate role="BREWER">
+                    <DropdownMenuItem>
+                      <Briefcase className="mr-2 h-4 w-4" />
+                      Minhas Produções
+                    </DropdownMenuItem>
+                  </RoleGate>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
@@ -177,7 +226,12 @@ const Header: React.FC = () => {
                             {user.email?.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm text-muted-foreground">{user.email}</span>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{profile?.full_name || user.email}</p>
+                          <Badge variant={getRoleVariant(role)} className="text-xs mt-1">
+                            {getRoleDisplayName(role)}
+                          </Badge>
+                        </div>
                       </div>
                       <Button 
                         variant="ghost" 
