@@ -7,14 +7,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import PurchaseSharesModal from '@/components/shares/PurchaseSharesModal';
 import { Coins, TrendingUp, Users, ShoppingCart } from 'lucide-react';
-
 interface SharesData {
   userShares: number;
   totalShares: number;
   shareValue: number;
   userVotingPower: number;
 }
-
 const SharesOverview: React.FC = () => {
   const [sharesData, setSharesData] = useState<SharesData>({
     userShares: 0,
@@ -24,36 +22,32 @@ const SharesOverview: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [showPurchaseModal, setShowPurchaseModal] = useState(false);
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   const fetchSharesData = async () => {
     if (!user) return;
-    
     try {
       // Get user profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .single();
-
+      const {
+        data: profile
+      } = await supabase.from('profiles').select('id').eq('user_id', user.id).single();
       if (profile) {
         // Get user shares
-        const { data: userShares } = await supabase
-          .from('beer_shares')
-          .select('*')
-          .eq('owner_id', profile.id);
+        const {
+          data: userShares
+        } = await supabase.from('beer_shares').select('*').eq('owner_id', profile.id);
 
         // Get total shares sold
-        const { data: totalShares } = await supabase
-          .from('beer_shares')
-          .select('share_number');
-
+        const {
+          data: totalShares
+        } = await supabase.from('beer_shares').select('share_number');
         setSharesData({
           userShares: userShares?.length || 0,
           totalShares: totalShares?.length || 0,
-          shareValue: 100, // Base value, could be dynamic
-          userVotingPower: ((userShares?.length || 0) / 10000) * 100
+          shareValue: 100,
+          // Base value, could be dynamic
+          userVotingPower: (userShares?.length || 0) / 10000 * 100
         });
       }
     } catch (error) {
@@ -62,24 +56,19 @@ const SharesOverview: React.FC = () => {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchSharesData();
   }, [user]);
-
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL'
     }).format(value);
   };
-
   if (loading) {
     return <div className="animate-pulse h-64 bg-muted rounded-lg"></div>;
   }
-
-  return (
-    <div className="space-y-6">
+  return <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -131,7 +120,7 @@ const SharesOverview: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-primary">{sharesData.totalShares}</div>
-            <Progress value={(sharesData.totalShares / 10000) * 100} className="mt-2" />
+            <Progress value={sharesData.totalShares / 10000 * 100} className="mt-2" />
           </CardContent>
         </Card>
       </div>
@@ -166,26 +155,15 @@ const SharesOverview: React.FC = () => {
           </div>
           
           <div className="flex gap-2">
-            <Button 
-              className="flex-1"
-              onClick={() => setShowPurchaseModal(true)}
-            >
+            <Button className="flex-1" onClick={() => setShowPurchaseModal(true)}>
               Comprar Cotas
             </Button>
-            <Button variant="outline" className="flex-1">
-              Marketplace
-            </Button>
+            
           </div>
         </CardContent>
       </Card>
       
-      <PurchaseSharesModal
-        isOpen={showPurchaseModal}
-        onClose={() => setShowPurchaseModal(false)}
-        onPurchaseSuccess={fetchSharesData}
-      />
-    </div>
-  );
+      <PurchaseSharesModal isOpen={showPurchaseModal} onClose={() => setShowPurchaseModal(false)} onPurchaseSuccess={fetchSharesData} />
+    </div>;
 };
-
 export default SharesOverview;
