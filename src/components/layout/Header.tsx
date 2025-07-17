@@ -34,8 +34,8 @@ const Header: React.FC = () => {
   const getRoleDisplayName = (role: string) => {
     switch (role) {
       case 'ADMIN': return 'Administrador';
-      case 'BREWER': return 'Cervejeiro';
-      case 'INVESTOR': return 'Investidor';
+      case 'MASTER_BREWER': return 'Mestre Cervejeiro';
+      case 'INVESTOR_BREWER': return 'Investidor';
       default: return 'Usuário';
     }
   };
@@ -43,8 +43,8 @@ const Header: React.FC = () => {
   const getRoleVariant = (role: string) => {
     switch (role) {
       case 'ADMIN': return 'destructive';
-      case 'BREWER': return 'secondary';
-      case 'INVESTOR': return 'default';
+      case 'MASTER_BREWER': return 'secondary';
+      case 'INVESTOR_BREWER': return 'default';
       default: return 'outline';
     }
   };
@@ -125,7 +125,7 @@ const Header: React.FC = () => {
                       Gerenciar Usuários
                     </DropdownMenuItem>
                   </RoleGate>
-                  <RoleGate role="BREWER">
+                  <RoleGate role="MASTER_BREWER">
                     <DropdownMenuItem>
                       <Briefcase className="mr-2 h-4 w-4" />
                       Minhas Produções

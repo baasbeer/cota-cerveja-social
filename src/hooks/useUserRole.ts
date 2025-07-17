@@ -2,16 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
-export type UserRole = 'ADMIN' | 'BREWER' | 'INVESTOR';
+export type UserRole = 'ADMIN' | 'MASTER_BREWER' | 'INVESTOR_BREWER';
 
 interface UserPermissions {
   canCreateRecipes: boolean;
   canAssumeProductions: boolean;
   canInvest: boolean;
   canManageUsers: boolean;
-  canVote: boolean;
-  canModerateVotes: boolean;
   canManageProductions: boolean;
+  canManageBeerCoins: boolean;
 }
 
 export interface UserProfile {
@@ -28,6 +27,7 @@ export interface UserProfile {
   certifications: string | null;
   investment_limit: number | null;
   preferred_styles: string[] | null;
+  beer_coin_balance?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -40,29 +40,26 @@ const getPermissions = (role: UserRole): UserPermissions => {
         canAssumeProductions: true,
         canInvest: true,
         canManageUsers: true,
-        canVote: true,
-        canModerateVotes: true,
         canManageProductions: true,
+        canManageBeerCoins: true,
       };
-    case 'BREWER':
+    case 'MASTER_BREWER':
       return {
         canCreateRecipes: true,
         canAssumeProductions: true,
         canInvest: false,
         canManageUsers: false,
-        canVote: true,
-        canModerateVotes: false,
         canManageProductions: true,
+        canManageBeerCoins: false,
       };
-    case 'INVESTOR':
+    case 'INVESTOR_BREWER':
       return {
         canCreateRecipes: false,
         canAssumeProductions: false,
         canInvest: true,
         canManageUsers: false,
-        canVote: true,
-        canModerateVotes: false,
         canManageProductions: false,
+        canManageBeerCoins: false,
       };
     default:
       return {
@@ -70,9 +67,8 @@ const getPermissions = (role: UserRole): UserPermissions => {
         canAssumeProductions: false,
         canInvest: false,
         canManageUsers: false,
-        canVote: false,
-        canModerateVotes: false,
         canManageProductions: false,
+        canManageBeerCoins: false,
       };
   }
 };
@@ -97,7 +93,7 @@ export const useUserRole = () => {
     enabled: !!user,
   });
 
-  const role = profile?.role || 'INVESTOR';
+  const role = profile?.role || 'INVESTOR_BREWER';
   const permissions = getPermissions(role);
 
   return {
