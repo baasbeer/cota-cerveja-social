@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserRole } from '@/hooks/useUserRole';
 import { AdminDashboard } from './AdminDashboard';
-import { MasterBrewerDashboard } from './MasterBrewerDashboard';
+import { BrewerDashboard } from './BrewerDashboard';
 import { InvestorDashboard } from './InvestorDashboard';
 import { RoleGate } from '@/components/auth/RoleGate';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,11 +41,11 @@ const Dashboard: React.FC = () => {
           <AdminDashboard />
         </RoleGate>
         
-        <RoleGate role="MASTER_BREWER">
-          <MasterBrewerDashboard />
+        <RoleGate role="BREWER">
+          <BrewerDashboard />
         </RoleGate>
         
-        <RoleGate role="INVESTOR_BREWER">
+        <RoleGate role="INVESTOR">
           <InvestorDashboard />
         </RoleGate>
       </div>
